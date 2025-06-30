@@ -1,0 +1,107 @@
+services:
+  # PostgreSQL (for Airflow metadata + DBT)
+  postgres:
+    image: postgres:14
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - alertsys_net
+
+  airflow-init:
+    image: apache/airflow:2.6.0-python3.9
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - GOOGLE_APPLICATION_CREDENTIALS=/opt/airflow/alert_credentials.json
+      - PIP_DEFAULT_TIMEOUT=100
+      - PIP_RETRIES=5
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./requirements.txt:/opt/airflow/requirements.txt
+      - ./data:/opt/airflow/data
+      - ./alert_credentials.json:/opt/airflow/alert_credentials.json
+      - ./dbt:/opt/airflow/dbt 
+      - ./cloud_functions:/opt/airflow/cloud_functions
+      - ./python_scripts:/opt/airflow/python_scripts
+      - ./.env:/opt/airflow/.env
+    command: >
+      bash -c "
+      pip install --no-cache-dir --default-timeout=100 --retries 5 -r /opt/airflow/requirements.txt &&
+      airflow db init &&
+      airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin
+      "
+    networks:
+      - alertsys_net
+
+  # Airflow Webserver
+  webserver:
+    image: apache/airflow:2.6.0-python3.9
+    depends_on:
+      - airflow-init
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__WEBSERVER__SECRET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+      - GOOGLE_APPLICATION_CREDENTIALS=/opt/airflow/alert_credentials.json
+      - PIP_DEFAULT_TIMEOUT=100
+      - PIP_RETRIES=5
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./requirements.txt:/opt/airflow/requirements.txt
+      - ./data:/opt/airflow/data
+      - ./alert_credentials.json:/opt/airflow/alert_credentials.json
+      - ./dbt:/opt/airflow/dbt 
+      - ./cloud_functions:/opt/airflow/cloud_functions
+      - ./python_scripts:/opt/airflow/python_scripts
+      - ./.env:/opt/airflow/.env
+    ports:
+      - "8080:8080"
+    command: >
+      airflow webserver
+    networks:
+      - alertsys_net
+
+  # Airflow Scheduler
+  scheduler:
+    image: apache/airflow:2.6.0-python3.9
+    depends_on:
+      - airflow-init
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - GOOGLE_APPLICATION_CREDENTIALS=/opt/airflow/alert_credentials.json
+      - PIP_DEFAULT_TIMEOUT=100
+      - PIP_RETRIES=5
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./requirements.txt:/opt/airflow/requirements.txt
+      - ./data:/opt/airflow/data
+      - ./alert_credentials.json:/opt/airflow/alert_credentials.json
+      - ./dbt:/opt/airflow/dbt 
+      - ./cloud_functions:/opt/airflow/cloud_functions
+      - ./python_scripts:/opt/airflow/python_scripts
+      - ./.env:/opt/airflow/.env
+    command: >
+      airflow scheduler
+    networks:
+      - alertsys_net
+
+networks:
+  alertsys_net:

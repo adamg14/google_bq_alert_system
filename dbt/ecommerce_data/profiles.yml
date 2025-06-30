@@ -1,0 +1,14 @@
+ecommerce_data:
+  target: dev
+  outputs:
+    dev:
+      dataset: alert_system
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      keyfile: opt/airflow/alert_credentials.json
+      location: US
+      method: service-account
+      priority: interactive
+      project: alert-system-464222
+      threads: 1
+      type: bigquery

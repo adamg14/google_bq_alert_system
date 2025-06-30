@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: raw_ecommerce_data
+    description: "Ecommerce click stream, user transactions and actions in raw form"
+    database: alert-system-464222
+    schema: raw_data
+
+    freshness:
+      warn_after: {count: 24, period: hour}
+      error_after: {count: 48, period: hour}
+
+    tables:
+      - name: ecommerce_clickstream
+        description: "Raw clickstream data capturing user actions with products"
+
+          

@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: staging_ecommerce_data
+
+    config:
+      materialise: table
+      schema: staging
+      tags: ['staging', 'ecommerce', 'clickstream', 'user', 'actions']
+    
+    columns:
+      - name: event_id
+      - name: session_id,
+        tests:
+          - not_null
+          - unique
+        meta:
+          original_field: "ActionID"
+
+      - name: customer_id
+        tests:
+          - not_null
+      
+      - name: product_id
+      - name: event_timestamp
+        tests:
+          - not_null
+          
+      - name: event_type
+        tets:
+          - not_null
+          - accepted_values:
+              values: ['add_to_cart', 'click', 'login', 'logout', 'page_view', 'product_view', 'purchase']
+
+      - name: session_type
