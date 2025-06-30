@@ -19,10 +19,6 @@
 WITH SOURCE_TABLE AS (
     SELECT *
     FROM {{ source("raw_ecommerce_data", "ecommerce_clickstream") }}
-
-    {% if is_incremental() %}
-        WHERE _loaded_at > (SELECT MAX(_loaded_at) FROM {{ this }})
-     {% endif %}
 )
 
 SELECT
