@@ -1,0 +1,109 @@
+version: 2
+models:
+  - name: mart_cohort_analysis
+    config:
+      materialized: table
+      schema: mart
+    
+    columns:
+      - name: cohort
+        tests:
+          - not_null
+      - name: cohort_size
+        tests:
+          - not_null
+      - name: active_months
+        tests:
+          - not_null
+      - name: retained_customers
+        tests:
+          - not_null
+      - name: purchase_count
+        tests:
+          - not_null
+      - name: total_revenue
+        tests:
+          - not_null
+      - name: aov
+        tests:
+          - not_null
+      - name: total_sessions
+        tests:
+          - not_null
+
+  - name: mart_customers
+    config:
+      materialized: table
+      schema: mart
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - unique
+      - name: customer_events
+        tests:
+          - not_null
+      - name: total_sessions
+        tests:
+          - not_null
+      - name: first_session
+        tests:
+          - not_null
+      - name: latest_session
+        tests:
+          - not_null
+      - name: total_revenue
+        tests:
+          - not_null
+
+  - name: mart_daily_analytics
+    config:
+      materialized: table
+      schema: mart
+    columns:
+      - name: day
+        tests:
+          - not_null
+      - name: total_sessions
+        tests:
+          - not_null
+      - name: total_product_views
+        tests:
+          - not_null
+      - name: total_clicks
+        tests:
+          - not_null
+      - name: total_cart_adds
+        tests:
+          - not_null
+      - name: total_purchases
+        tests:
+          - not_null
+      - name: total_revenue
+        tests:
+          - not_null
+      - name: total_customers
+        tests:
+          - not_null
+
+
+  - name: mart_purchase_events
+    config:
+      materialized: table
+      schema: mart
+    columns:
+      # columns already tested on load from staging table.
+      - name: event_id
+      - name: event_timestamp
+      - name: customer_id
+      - name: product_id
+      - name: session_id
+      - name: event_type
+        tests:
+          - accepted_values: 
+              values: ['purchase']
+      - name: amount
+      - name: outcome
+      - name: _dbt_loaded_at
+      
+

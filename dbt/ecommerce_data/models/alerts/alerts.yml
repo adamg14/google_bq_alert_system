@@ -1,0 +1,22 @@
+version: 2
+models:
+  - name: alert_data_freshness
+    config:
+      materialized: view
+      schema: alerts
+      
+      columns:
+        - name: latest_data_load
+        - name: last_update
+        - name: freshness
+  
+  - name: alert_volume
+    config:
+      materialized: view
+      schema: alerts
+
+    columns:
+      - name: day
+      - name: volume_alert
+    
+  
