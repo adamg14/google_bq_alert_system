@@ -56,7 +56,7 @@ gcloud functions deploy airflow-success-slack-alert \
   --entry-point=slack_success_alert
 ```
 
-
+### Project Specification
 • This is an ELT pipeline - source data is loaded straight to BigQuery and transformed there
 
 • Our main dbt pipelines run once every 2 hours
