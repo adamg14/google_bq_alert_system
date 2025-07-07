@@ -1,6 +1,11 @@
 # Google BigQuery Alert System
 A serverless real-time alerting system for Google BigQuery that sends slack alerts using Google Cloud Functions using two types of alert methods: the result of data refresh/testing tasks within the Airflow DAG and queries to views within the Data Warehouse. 
 
+## Project Details
+- Sends two type of alerts error (failed Data refresh/test tasks) and warnings (based on irregularities within data)
+- Code completely containerised using Docker for CI/CD good practice
+- Uses Google Cloud Functions to send notifications to slack using Slack API
+
 ## Possible improvements to this project
 - Seperate warning and error notification message formats.
 - Deployment of the Airflow DAG to the cloud, via either:
